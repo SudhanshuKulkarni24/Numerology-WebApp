@@ -1,11 +1,12 @@
 import os
 from flask import Flask, request, render_template
 
+# Define paths
 base_dir = os.path.dirname(os.path.abspath(__file__))
 template_path = os.path.join(base_dir, '..', 'templates')
 
+# Flask app setup
 app = Flask(__name__, template_folder=template_path)
-
 
 # Numerology Mappings
 pythagorean = {
@@ -19,6 +20,7 @@ chaldean = {
     'S': 3, 'T': 4, 'U': 6, 'V': 6, 'W': 6, 'X': 5, 'Y': 1, 'Z': 7
 }
 
+# Numerology calculation logic
 def calculate_numerology(name, mapping):
     total = 0
     for char in name:
@@ -26,6 +28,7 @@ def calculate_numerology(name, mapping):
             total += mapping[char.upper()]
     return total
 
+# Route: Home (GET + POST)
 @app.route("/", methods=["GET", "POST"])
 def home():
     if request.method == "POST":
@@ -37,5 +40,14 @@ def home():
                                chaldean=chaldean_result)
     return render_template("index.html", result=False)
 
+# Route: Favicon (to prevent 500 errors on /favicon.ico)
+@app.route('/favicon.ico')
+def favicon():
+    return "", 204
+
 # Required by Vercel
 handler = app
+
+# Optional: for local testing
+if __name__ == "__main__":
+    app.run(debug=True)
