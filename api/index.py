@@ -128,14 +128,7 @@ def calculate_numerology(name, mapping):
     return total
 
 def reduce_to_single_digit(number):
-    """Reduce number to single digit (1-9) except for master numbers 11, 22, 33"""
-    if number in [11, 22, 33]:
-        return number
-    while number >= 10:
-        number = sum(int(digit) for digit in str(number))
-        if number in [11, 22, 33]:
-            return number
-    return number
+    return number%9
 
 @app.route("/", methods=["GET", "POST"])
 def index():
