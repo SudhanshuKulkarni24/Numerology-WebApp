@@ -1,6 +1,11 @@
+import os
 from flask import Flask, request, render_template
 
-app = Flask(__name__, template_folder="../templates")
+base_dir = os.path.dirname(os.path.abspath(__file__))
+template_path = os.path.join(base_dir, '..', 'templates')
+
+app = Flask(__name__, template_folder=template_path)
+
 
 # Numerology Mappings
 pythagorean = {
