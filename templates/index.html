@@ -1,0 +1,21 @@
+
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Numerology Calculator</title>
+</head>
+<body>
+    <h1>Numerology Calculator</h1>
+    <form method="post">
+        <label>Enter a name or word:</label><br>
+        <input type="text" name="name" required><br><br>
+        <input type="submit" value="Calculate">
+    </form>
+
+    {% if result %}
+        <h2>Results:</h2>
+        <p>Pythagorean Numerology: {{ result.pythagorean }}</p>
+        <p>Chaldean Numerology: {{ result.chaldean }}</p>
+    {% endif %}
+</body>
+</html>
