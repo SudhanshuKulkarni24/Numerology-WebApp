@@ -1,4 +1,3 @@
-
 <!DOCTYPE html>
 <html>
 <head>
@@ -6,16 +5,14 @@
 </head>
 <body>
     <h1>Numerology Calculator</h1>
-    <form method="post">
-        <label>Enter a name or word:</label><br>
-        <input type="text" name="name" required><br><br>
+    <form method="POST">
+        <input type="text" name="name" placeholder="Enter your name" required>
         <input type="submit" value="Calculate">
     </form>
-
     {% if result %}
-        <h2>Results:</h2>
-        <p>Pythagorean Numerology: {{ result.pythagorean }}</p>
-        <p>Chaldean Numerology: {{ result.chaldean }}</p>
+        <h2>Results for "{{ name }}"</h2>
+        <p><strong>Pythagorean:</strong> {{ pythagorean }}</p>
+        <p><strong>Chaldean:</strong> {{ chaldean }}</p>
     {% endif %}
 </body>
 </html>
