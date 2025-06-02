@@ -23,42 +23,112 @@ HTML_TEMPLATE = """
 <head>
     <title>Numerology Calculator</title>
     <style>
+        :root {
+            --bg-color: #f5f5f5;
+            --container-bg: white;
+            --text-color: #333;
+            --text-secondary: #555;
+            --text-muted: #666;
+            --border-color: #ddd;
+            --shadow: rgba(0,0,0,0.1);
+            --accent-color: #4CAF50;
+            --accent-hover: #45a049;
+            --results-bg: #e8f5e8;
+        }
+
+        [data-theme="dark"] {
+            --bg-color: #1a1a1a;
+            --container-bg: #2d2d2d;
+            --text-color: #e0e0e0;
+            --text-secondary: #b0b0b0;
+            --text-muted: #888;
+            --border-color: #444;
+            --shadow: rgba(0,0,0,0.3);
+            --accent-color: #66BB6A;
+            --accent-hover: #5CB860;
+            --results-bg: #1e3a1e;
+        }
+
+        * {
+            transition: background-color 0.3s ease, color 0.3s ease, border-color 0.3s ease;
+        }
+
         body {
             font-family: Arial, sans-serif;
             max-width: 600px;
             margin: 50px auto;
             padding: 20px;
-            background-color: #f5f5f5;
+            background-color: var(--bg-color);
+            color: var(--text-color);
         }
+
+        .theme-toggle {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            background: none;
+            border: 2px solid var(--border-color);
+            border-radius: 50%;
+            width: 50px;
+            height: 50px;
+            cursor: pointer;
+            font-size: 20px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background-color: var(--container-bg);
+            color: var(--text-color);
+        }
+
+        .theme-toggle:hover {
+            transform: scale(1.1);
+            border-color: var(--accent-color);
+        }
+
         .container {
-            background-color: white;
+            background-color: var(--container-bg);
             padding: 30px;
             border-radius: 10px;
-            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            box-shadow: 0 2px 10px var(--shadow);
+            position: relative;
         }
+
         h1 {
-            color: #333;
+            color: var(--text-color);
             text-align: center;
+            margin-bottom: 30px;
         }
+
         form {
             margin: 20px 0;
         }
+
         label {
             display: block;
             margin-bottom: 8px;
             font-weight: bold;
-            color: #555;
+            color: var(--text-secondary);
         }
+
         input[type="text"] {
             width: 100%;
             padding: 10px;
-            border: 2px solid #ddd;
+            border: 2px solid var(--border-color);
             border-radius: 5px;
             font-size: 16px;
             margin-bottom: 15px;
+            background-color: var(--container-bg);
+            color: var(--text-color);
+            box-sizing: border-box;
         }
+
+        input[type="text"]:focus {
+            outline: none;
+            border-color: var(--accent-color);
+        }
+
         input[type="submit"] {
-            background-color: #4CAF50;
+            background-color: var(--accent-color);
             color: white;
             padding: 12px 24px;
             border: none;
@@ -66,31 +136,49 @@ HTML_TEMPLATE = """
             cursor: pointer;
             font-size: 16px;
         }
+
         input[type="submit"]:hover {
-            background-color: #45a049;
+            background-color: var(--accent-hover);
         }
+
         .results {
             margin-top: 30px;
             padding: 20px;
-            background-color: #e8f5e8;
+            background-color: var(--results-bg);
             border-radius: 5px;
-            border-left: 4px solid #4CAF50;
+            border-left: 4px solid var(--accent-color);
         }
+
         .result-item {
             margin: 10px 0;
             font-size: 18px;
         }
+
         .result-label {
             font-weight: bold;
-            color: #333;
+            color: var(--text-color);
         }
+
         .result-value {
-            color: #4CAF50;
+            color: var(--accent-color);
             font-weight: bold;
+        }
+
+        .results h2 {
+            color: var(--text-color);
+            margin-top: 0;
+        }
+
+        .results p {
+            color: var(--text-muted);
         }
     </style>
 </head>
-<body>
+<body data-theme="light">
+    <button class="theme-toggle" onclick="toggleTheme()" title="Toggle theme">
+        <span id="theme-icon">🌙</span>
+    </button>
+    
     <div class="container">
         <h1>Numerology Calculator</h1>
         <form method="post">
@@ -116,6 +204,38 @@ HTML_TEMPLATE = """
             </div>
         {% endif %}
     </div>
+    
+    <script>
+        // Theme toggle functionality
+        function toggleTheme() {
+            const body = document.body;
+            const themeIcon = document.getElementById('theme-icon');
+            const currentTheme = body.getAttribute('data-theme');
+            
+            if (currentTheme === 'light') {
+                body.setAttribute('data-theme', 'dark');
+                themeIcon.textContent = '☀️';
+                localStorage.setItem('theme', 'dark');
+            } else {
+                body.setAttribute('data-theme', 'light');
+                themeIcon.textContent = '🌙';
+                localStorage.setItem('theme', 'light');
+            }
+        }
+        
+        // Load saved theme preference
+        function loadTheme() {
+            const savedTheme = localStorage.getItem('theme') || 'light';
+            const body = document.body;
+            const themeIcon = document.getElementById('theme-icon');
+            
+            body.setAttribute('data-theme', savedTheme);
+            themeIcon.textContent = savedTheme === 'dark' ? '☀️' : '🌙';
+        }
+        
+        // Initialize theme on page load
+        document.addEventListener('DOMContentLoaded', loadTheme);
+    </script>
 </body>
 </html>
 """
@@ -128,7 +248,14 @@ def calculate_numerology(name, mapping):
     return total
 
 def reduce_to_single_digit(number):
-    return number%9
+    """Reduce number to single digit (1-9) except for master numbers 11, 22, 33"""
+    if number in [11, 22, 33]:
+        return number
+    while number >= 10:
+        number = sum(int(digit) for digit in str(number))
+        if number in [11, 22, 33]:
+            return number
+    return number
 
 @app.route("/", methods=["GET", "POST"])
 def index():
