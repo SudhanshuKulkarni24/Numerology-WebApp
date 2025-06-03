@@ -95,11 +95,12 @@ def create_losho_grid(name, birth_date):
         # Basic Losho grid logic (you may need to adjust this based on your requirements)
         grid = [[0 for _ in range(3)] for _ in range(3)]
         
-        # Calculate numbers from name
+        # Calculate numbers from name (if provided)
         name_numbers = []
-        for char in name.upper():
-            if char.isalpha():
-                name_numbers.append(pythagorean[char])
+        if name:  # Only process name if provided
+            for char in name.upper():
+                if char.isalpha():
+                    name_numbers.append(pythagorean[char])
         
         # Calculate numbers from birth date
         birth_numbers = []
@@ -230,8 +231,8 @@ LOSHO_TEMPLATE = """
         
         <form method="post">
             <div class="form-group">
-                <label>Full Name:</label>
-                <input type="text" name="name" required placeholder="Enter your full name" value="{{ input_name }}">
+                <label>Full Name (optional):</label>
+                <input type="text" name="name" placeholder="Enter your full name (optional)" value="{{ input_name }}">
             </div>
             
             <div class="form-group">
@@ -264,7 +265,9 @@ LOSHO_TEMPLATE = """
                 </div>
                 
                 <p style="text-align: center; margin-top: 20px;">
-                    <strong>Name:</strong> {{ input_name }}<br>
+                    {% if input_name %}
+                        <strong>Name:</strong> {{ input_name }}<br>
+                    {% endif %}
                     <strong>Birth Date:</strong> {{ input_birth_date }}
                 </p>
             </div>
@@ -323,10 +326,10 @@ def losho_grid():
     input_birth_date = ""
     
     if request.method == "POST":
-        name = request.form.get("name", "").strip()
+        name = request.form.get("name", "").strip()  # Name is optional now
         birth_date = request.form.get("birth_date", "").strip()
         
-        if name and birth_date:
+        if birth_date:  # Only birth_date is required
             input_name = name
             input_birth_date = birth_date
             
@@ -445,7 +448,6 @@ HTML_TEMPLATE = """
 
         .nav-links a:hover {
             background-color: var(--accent-hover);
-            transform: translateY(-2px);
         }
 
         form {
@@ -461,11 +463,11 @@ HTML_TEMPLATE = """
 
         input[type="text"] {
             width: 100%;
-            padding: 15px;
+            padding: 10px;
             border: 2px solid var(--border-color);
-            border-radius: 8px;
+            border-radius: 5px;
             font-size: 16px;
-            margin-bottom: 20px;
+            margin-bottom: 15px;
             background-color: var(--container-bg);
             color: var(--text-color);
             box-sizing: border-box;
@@ -474,26 +476,20 @@ HTML_TEMPLATE = """
         input[type="text"]:focus {
             outline: none;
             border-color: var(--accent-color);
-            box-shadow: 0 0 0 3px rgba(76, 175, 80, 0.1);
         }
 
         input[type="submit"] {
             background-color: var(--accent-color);
             color: white;
-            padding: 15px 30px;
+            padding: 12px 24px;
             border: none;
-            border-radius: 8px;
+            border-radius: 5px;
             cursor: pointer;
             font-size: 16px;
-            font-weight: 600;
-            width: 100%;
-            transition: all 0.3s ease;
         }
 
         input[type="submit"]:hover {
             background-color: var(--accent-hover);
-            transform: translateY(-2px);
-            box-shadow: 0 4px 15px rgba(76, 175, 80, 0.3);
         }
 
         .results {
