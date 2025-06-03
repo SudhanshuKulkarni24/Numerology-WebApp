@@ -292,10 +292,9 @@ def reduce_to_single_digit(number):
     return number
 
 # Routes
-@app.route("/")
+@app.route("/", methods=["GET", "POST"])
 @handle_errors
 def index():
-    # Your existing numerology calculator code
     result = None
     input_name = ""
     if request.method == "POST":
@@ -342,6 +341,303 @@ def losho_grid():
                                 result=result, 
                                 input_name=input_name,
                                 input_birth_date=input_birth_date)
+
+# Main numerology calculator HTML template
+HTML_TEMPLATE = """
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Numerology Calculator</title>
+    <style>
+        :root {
+            --bg-color: #f5f5f5;
+            --container-bg: white;
+            --text-color: #333;
+            --text-secondary: #555;
+            --text-muted: #666;
+            --border-color: #ddd;
+            --shadow: rgba(0,0,0,0.1);
+            --accent-color: #4CAF50;
+            --accent-hover: #45a049;
+            --results-bg: #e8f5e8;
+        }
+
+        [data-theme="dark"] {
+            --bg-color: #1a1a1a;
+            --container-bg: #2d2d2d;
+            --text-color: #e0e0e0;
+            --text-secondary: #b0b0b0;
+            --text-muted: #888;
+            --border-color: #444;
+            --shadow: rgba(0,0,0,0.3);
+            --accent-color: #66BB6A;
+            --accent-hover: #5CB860;
+            --results-bg: #1e3a1e;
+        }
+
+        * {
+            transition: background-color 0.3s ease, color 0.3s ease, border-color 0.3s ease;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            max-width: 700px;
+            margin: 50px auto;
+            padding: 20px;
+            background-color: var(--bg-color);
+            color: var(--text-color);
+        }
+
+        .theme-toggle {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            background: none;
+            border: 2px solid var(--border-color);
+            border-radius: 50%;
+            width: 50px;
+            height: 50px;
+            cursor: pointer;
+            font-size: 20px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background-color: var(--container-bg);
+            color: var(--text-color);
+        }
+
+        .theme-toggle:hover {
+            transform: scale(1.1);
+            border-color: var(--accent-color);
+        }
+
+        .container {
+            background-color: var(--container-bg);
+            padding: 30px;
+            border-radius: 15px;
+            box-shadow: 0 4px 20px var(--shadow);
+            position: relative;
+        }
+
+        h1 {
+            color: var(--text-color);
+            text-align: center;
+            margin-bottom: 30px;
+            font-size: 2.5em;
+            font-weight: 300;
+        }
+
+        .nav-links {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+
+        .nav-links a {
+            display: inline-block;
+            margin: 0 15px;
+            padding: 10px 20px;
+            background-color: var(--accent-color);
+            color: white;
+            text-decoration: none;
+            border-radius: 8px;
+            transition: all 0.3s ease;
+        }
+
+        .nav-links a:hover {
+            background-color: var(--accent-hover);
+            transform: translateY(-2px);
+        }
+
+        form {
+            margin: 20px 0;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 600;
+            color: var(--text-secondary);
+        }
+
+        input[type="text"] {
+            width: 100%;
+            padding: 15px;
+            border: 2px solid var(--border-color);
+            border-radius: 8px;
+            font-size: 16px;
+            margin-bottom: 20px;
+            background-color: var(--container-bg);
+            color: var(--text-color);
+            box-sizing: border-box;
+        }
+
+        input[type="text"]:focus {
+            outline: none;
+            border-color: var(--accent-color);
+            box-shadow: 0 0 0 3px rgba(76, 175, 80, 0.1);
+        }
+
+        input[type="submit"] {
+            background-color: var(--accent-color);
+            color: white;
+            padding: 15px 30px;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 16px;
+            font-weight: 600;
+            width: 100%;
+            transition: all 0.3s ease;
+        }
+
+        input[type="submit"]:hover {
+            background-color: var(--accent-hover);
+            transform: translateY(-2px);
+            box-shadow: 0 4px 15px rgba(76, 175, 80, 0.3);
+        }
+
+        .results {
+            margin-top: 30px;
+            padding: 25px;
+            background-color: var(--results-bg);
+            border-radius: 10px;
+            border-left: 5px solid var(--accent-color);
+        }
+
+        .result-item {
+            margin: 15px 0;
+            font-size: 18px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 10px 0;
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        .result-item:last-of-type {
+            border-bottom: none;
+        }
+
+        .result-label {
+            font-weight: 600;
+            color: var(--text-color);
+        }
+
+        .result-value {
+            color: var(--accent-color);
+            font-weight: bold;
+            font-size: 24px;
+            background-color: var(--container-bg);
+            padding: 8px 16px;
+            border-radius: 20px;
+            border: 2px solid var(--accent-color);
+        }
+
+        .calculation-details {
+            font-size: 14px;
+            color: var(--text-muted);
+            margin-top: 10px;
+            padding: 10px;
+            background-color: var(--container-bg);
+            border-radius: 5px;
+        }
+
+        .results h2 {
+            color: var(--text-color);
+            margin-top: 0;
+            margin-bottom: 20px;
+        }
+
+        .input-display {
+            margin-top: 20px;
+            padding: 15px;
+            background-color: var(--container-bg);
+            border-radius: 8px;
+            text-align: center;
+        }
+
+        .input-display strong {
+            color: var(--accent-color);
+        }
+    </style>
+</head>
+<body data-theme="light">
+    <button class="theme-toggle" onclick="toggleTheme()" title="Toggle theme">
+        <span id="theme-icon">🌙</span>
+    </button>
+    
+    <div class="container">
+        <h1>✨ Numerology Calculator</h1>
+        
+        <div class="nav-links">
+            <a href="/">Numerology</a>
+            <a href="/losho">Losho Grid</a>
+        </div>
+        
+        <form method="post">
+            <label>Enter a name or word:</label>
+            <input type="text" name="name" required placeholder="Enter your name here..." value="{{ input_name }}">
+            <input type="submit" value="Calculate Numerology">
+        </form>
+
+        {% if result %}
+            <div class="results">
+                <h2>Your Numerology Results:</h2>
+                <div class="result-item">
+                    <span class="result-label">Pythagorean Numerology:</span> 
+                    <span class="result-value">{{ result.pythagorean }}</span>
+                </div>
+                <div class="calculation-details">
+                    Total: {{ result.pythagorean_total }} → Reduced: {{ result.pythagorean }}
+                </div>
+                <div class="result-item">
+                    <span class="result-label">Chaldean Numerology:</span> 
+                    <span class="result-value">{{ result.chaldean }}</span>
+                </div>
+                <div class="calculation-details">
+                    Total: {{ result.chaldean_total }} → Reduced: {{ result.chaldean }}
+                </div>
+                <div class="input-display">
+                    <strong>Input:</strong> "{{ input_name }}"
+                </div>
+            </div>
+        {% endif %}
+    </div>
+    
+    <script>
+        // Theme toggle functionality
+        function toggleTheme() {
+            const body = document.body;
+            const themeIcon = document.getElementById('theme-icon');
+            const currentTheme = body.getAttribute('data-theme');
+            
+            if (currentTheme === 'light') {
+                body.setAttribute('data-theme', 'dark');
+                themeIcon.textContent = '☀️';
+                localStorage.setItem('theme', 'dark');
+            } else {
+                body.setAttribute('data-theme', 'light');
+                themeIcon.textContent = '🌙';
+                localStorage.setItem('theme', 'light');
+            }
+        }
+        
+        // Load saved theme preference
+        function loadTheme() {
+            const savedTheme = localStorage.getItem('theme') || 'light';
+            const body = document.body;
+            const themeIcon = document.getElementById('theme-icon');
+            
+            body.setAttribute('data-theme', savedTheme);
+            themeIcon.textContent = savedTheme === 'dark' ? '☀️' : '🌙';
+        }
+        
+        // Initialize theme on page load
+        document.addEventListener('DOMContentLoaded', loadTheme);
+    </script>
+</body>
+</html>
+"""
 
 # Global error handler
 @app.errorhandler(500)
