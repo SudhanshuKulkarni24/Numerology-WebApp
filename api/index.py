@@ -1,7 +1,11 @@
 from flask import Flask, request, render_template_string
 from datetime import datetime
+import logging
 
 app = Flask(__name__)
+
+# Enable logging for debugging
+logging.basicConfig(level=logging.DEBUG)
 
 # Pythagorean numerology mapping
 pythagorean = {
@@ -131,32 +135,33 @@ BASE_STYLES = """
         }
 """
 
-# JavaScript for theme toggle
+# JavaScript for theme toggle - Fixed to work without localStorage
 THEME_SCRIPT = """
     <script>
+        // Use a simple variable instead of localStorage
+        let currentTheme = 'light';
+        
         function toggleTheme() {
             const body = document.body;
             const themeIcon = document.getElementById('theme-icon');
-            const currentTheme = body.getAttribute('data-theme');
             
             if (currentTheme === 'light') {
                 body.setAttribute('data-theme', 'dark');
                 themeIcon.textContent = '☀️';
-                localStorage.setItem('theme', 'dark');
+                currentTheme = 'dark';
             } else {
                 body.setAttribute('data-theme', 'light');
                 themeIcon.textContent = '🌙';
-                localStorage.setItem('theme', 'light');
+                currentTheme = 'light';
             }
         }
         
         function loadTheme() {
-            const savedTheme = localStorage.getItem('theme') || 'light';
             const body = document.body;
             const themeIcon = document.getElementById('theme-icon');
             
-            body.setAttribute('data-theme', savedTheme);
-            themeIcon.textContent = savedTheme === 'dark' ? '☀️' : '🌙';
+            body.setAttribute('data-theme', currentTheme);
+            themeIcon.textContent = currentTheme === 'dark' ? '☀️' : '🌙';
         }
         
         document.addEventListener('DOMContentLoaded', loadTheme);
@@ -295,7 +300,7 @@ HOME_TEMPLATE = f"""
 </html>
 """
 
-# Name calculator template
+# Name calculator template - Fixed template syntax
 NAME_CALC_TEMPLATE = f"""
 <!DOCTYPE html>
 <html>
@@ -428,7 +433,7 @@ NAME_CALC_TEMPLATE = f"""
 </html>
 """
 
-# Lo Shu Grid template
+# Lo Shu Grid template - Fixed template syntax and improved error handling
 LO_SHU_TEMPLATE = f"""
 <!DOCTYPE html>
 <html>
@@ -580,6 +585,15 @@ LO_SHU_TEMPLATE = f"""
         .missing-tag {{
             background-color: #f44336;
         }}
+
+        .error-message {{
+            background-color: #ffebee;
+            color: #c62828;
+            padding: 15px;
+            border-radius: 5px;
+            border-left: 4px solid #f44336;
+            margin: 20px 0;
+        }}
     </style>
 </head>
 <body data-theme="light">
@@ -600,21 +614,27 @@ LO_SHU_TEMPLATE = f"""
             <div class="date-inputs">
                 <div class="date-input">
                     <label>Day:</label>
-                    <input type="number" name="day" min="1" max="31" required value="{{{{ day or '' }}}}">
+                    <input type="number" name="day" min="1" max="31" required value="{{{{ day if day else '' }}}}">
                 </div>
                 <div class="date-input">
                     <label>Month:</label>
-                    <input type="number" name="month" min="1" max="12" required value="{{{{ month or '' }}}}">
+                    <input type="number" name="month" min="1" max="12" required value="{{{{ month if month else '' }}}}">
                 </div>
                 <div class="date-input">
                     <label>Year:</label>
-                    <input type="number" name="year" min="1900" max="2100" required value="{{{{ year or '' }}}}">
+                    <input type="number" name="year" min="1900" max="2100" required value="{{{{ year if year else '' }}}}">
                 </div>
             </div>
             <div class="submit-btn">
                 <input type="submit" value="Generate Lo Shu Grid">
             </div>
         </form>
+
+        {{% if error_message %}}
+            <div class="error-message">
+                {{{{ error_message }}}}
+            </div>
+        {{% endif %}}
 
         {{% if grid_data %}}
             <div class="grid-container">
@@ -632,7 +652,7 @@ LO_SHU_TEMPLATE = f"""
                 
                 <div class="analysis-section">
                     <h4>Birth Date:</h4>
-                    <p>{{{{ grid_data.date_string }}</p>
+                    <p>{{{{ grid_data.date_string }}}}</p>
                 </div>
 
                 <div class="analysis-section">
@@ -657,7 +677,7 @@ LO_SHU_TEMPLATE = f"""
 
                 <div class="analysis-section">
                     <h4>Total Numbers:</h4>
-                    <p><strong>{{{{ grid_data.total_count }}</strong> numbers from your birth date</p>
+                    <p><strong>{{{{ grid_data.total_count }}}}</strong> numbers from your birth date</p>
                 </div>
             </div>
         {{% endif %}}
@@ -669,6 +689,7 @@ LO_SHU_TEMPLATE = f"""
 """
 
 def calculate_numerology(name, mapping):
+    """Calculate numerology value for a name using the given mapping"""
     total = 0
     for char in name:
         if char.isalpha():
@@ -685,92 +706,144 @@ def reduce_to_single_digit(number):
             return number
     return number
 
+def is_valid_date(day, month, year):
+    """Validate if the given date is valid"""
+    try:
+        datetime(year, month, day)
+        return True
+    except ValueError:
+        return False
+
 def generate_lo_shu_grid(day, month, year):
     """Generate Lo Shu Grid from birth date"""
-    # Combine all digits from the birth date
-    date_string = f"{day:02d}{month:02d}{year}"
-    all_digits = [int(d) for d in date_string if d != '0']  # Remove zeros
-    
-    # Count occurrences of each number 1-9
-    number_counts = {}
-    for i in range(1, 10):
-        number_counts[i] = all_digits.count(i)
-    
-    # Create the grid (Lo Shu magic square positions)
-    # Traditional Lo Shu square:
-    # 4 9 2
-    # 3 5 7
-    # 8 1 6
-    lo_shu_positions = [4, 9, 2, 3, 5, 7, 8, 1, 6]
-    
-    # Fill grid based on number counts
-    grid = []
-    for pos in lo_shu_positions:
-        count = number_counts[pos]
-        if count > 0:
-            grid.append(str(pos) * count)  # Repeat number based on count
-        else:
-            grid.append('')  # Empty if not present
-    
-    # Analyze the grid
-    present_numbers = [i for i in range(1, 10) if number_counts[i] > 0]
-    missing_numbers = [i for i in range(1, 10) if number_counts[i] == 0]
-    
-    return {
-        'grid': grid,
-        'present_numbers': present_numbers,
-        'missing_numbers': missing_numbers,
-        'total_count': len(all_digits),
-        'date_string': f"{day}/{month}/{year}",
-        'number_counts': number_counts
-    }
+    try:
+        # Validate the date first
+        if not is_valid_date(day, month, year):
+            raise ValueError("Invalid date")
+        
+        # Combine all digits from the birth date
+        date_string = f"{day:02d}{month:02d}{year}"
+        all_digits = [int(d) for d in date_string if d != '0']  # Remove zeros
+        
+        # Count occurrences of each number 1-9
+        number_counts = {}
+        for i in range(1, 10):
+            number_counts[i] = all_digits.count(i)
+        
+        # Create the grid (Lo Shu magic square positions)
+        # Traditional Lo Shu square:
+        # 4 9 2
+        # 3 5 7
+        # 8 1 6
+        lo_shu_positions = [4, 9, 2, 3, 5, 7, 8, 1, 6]
+        
+        # Fill grid based on number counts
+        grid = []
+        for pos in lo_shu_positions:
+            count = number_counts[pos]
+            if count > 0:
+                grid.append(str(pos) * count)  # Repeat number based on count
+            else:
+                grid.append('')  # Empty if not present
+        
+        # Analyze the grid
+        present_numbers = [i for i in range(1, 10) if number_counts[i] > 0]
+        missing_numbers = [i for i in range(1, 10) if number_counts[i] == 0]
+        
+        return {
+            'grid': grid,
+            'present_numbers': present_numbers,
+            'missing_numbers': missing_numbers,
+            'total_count': len(all_digits),
+            'date_string': f"{day}/{month}/{year}",
+            'number_counts': number_counts
+        }
+    except Exception as e:
+        app.logger.error(f"Error generating Lo Shu grid: {str(e)}")
+        raise
 
 @app.route("/")
 def home():
+    """Home page route"""
     return HOME_TEMPLATE
 
 @app.route("/name-calculator", methods=["GET", "POST"])
 def name_calculator():
+    """Name calculator route"""
     result = None
     input_name = ""
-    if request.method == "POST":
-        name = request.form.get("name", "").strip()
-        if name:
-            input_name = name
-            pythagorean_result = calculate_numerology(name, pythagorean)
-            chaldean_result = calculate_numerology(name, chaldean)
-            
-            # Reduce to single digits (with master number exceptions)
-            pythagorean_reduced = reduce_to_single_digit(pythagorean_result)
-            chaldean_reduced = reduce_to_single_digit(chaldean_result)
-            
-            result = {
-                "pythagorean": pythagorean_reduced,
-                "chaldean": chaldean_reduced
-            }
+    
+    try:
+        if request.method == "POST":
+            name = request.form.get("name", "").strip()
+            if name:
+                input_name = name
+                pythagorean_result = calculate_numerology(name, pythagorean)
+                chaldean_result = calculate_numerology(name, chaldean)
+                
+                # Reduce to single digits (with master number exceptions)
+                pythagorean_reduced = reduce_to_single_digit(pythagorean_result)
+                chaldean_reduced = reduce_to_single_digit(chaldean_result)
+                
+                result = {
+                    "pythagorean": pythagorean_reduced,
+                    "chaldean": chaldean_reduced
+                }
+    except Exception as e:
+        app.logger.error(f"Error in name calculator: {str(e)}")
+        # Continue with empty result to show form
     
     return render_template_string(NAME_CALC_TEMPLATE, result=result, input_name=input_name)
 
 @app.route("/lo-shu-grid", methods=["GET", "POST"])
 def lo_shu_grid():
+    """Lo Shu Grid generator route"""
     grid_data = None
     day = month = year = None
+    error_message = None
     
-    if request.method == "POST":
-        try:
-            day = int(request.form.get("day", ""))
-            month = int(request.form.get("month", ""))
-            year = int(request.form.get("year", ""))
-            
-            # Validate date
-            if 1 <= day <= 31 and 1 <= month <= 12 and 1900 <= year <= 2100:
-                grid_data = generate_lo_shu_grid(day, month, year)
-            
-        except (ValueError, TypeError):
-            pass  # Invalid input, show form again
+    try:
+        if request.method == "POST":
+            try:
+                day = int(request.form.get("day", ""))
+                month = int(request.form.get("month", ""))
+                year = int(request.form.get("year", ""))
+                
+                # Validate date ranges
+                if not (1 <= day <= 31 and 1 <= month <= 12 and 1900 <= year <= 2100):
+                    error_message = "Please enter valid date ranges: Day (1-31), Month (1-12), Year (1900-2100)"
+                elif not is_valid_date(day, month, year):
+                    error_message = "Please enter a valid date (e.g., February 29th only exists in leap years)"
+                else:
+                    grid_data = generate_lo_shu_grid(day, month, year)
+                    
+            except (ValueError, TypeError) as e:
+                app.logger.error(f"Invalid input in Lo Shu grid: {str(e)}")
+                error_message = "Please enter valid numbers for day, month, and year"
+                # Keep the input values for user convenience
+                day = request.form.get("day", "")
+                month = request.form.get("month", "")  
+                year = request.form.get("year", "")
+                
+    except Exception as e:
+        app.logger.error(f"Unexpected error in Lo Shu grid: {str(e)}")
+        error_message = "An unexpected error occurred. Please try again."
     
-    return render_template_string(LO_SHU_TEMPLATE, grid_data=grid_data, day=day, month=month, year=year)
+    return render_template_string(
+        LO_SHU_TEMPLATE, 
+        grid_data=grid_data, 
+        day=day, 
+        month=month, 
+        year=year,
+        error_message=error_message
+    )
 
-# For Vercel
+@app.errorhandler(500)
+def internal_error(error):
+    """Handle internal server errors"""
+    app.logger.error(f"Internal server error: {str(error)}")
+    return "Internal Server Error. Please check the logs.", 500
+
+# For Vercel deployment
 if __name__ == "__main__":
     app.run(debug=True)
