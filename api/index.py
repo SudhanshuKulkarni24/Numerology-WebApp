@@ -433,7 +433,7 @@ NAME_CALC_TEMPLATE = f"""
 </html>
 """
 
-# Lo Shu Grid template - Fixed template syntax and improved error handling
+# Lo Shu Grid template - Enhanced with better visuals and numerology meanings
 LO_SHU_TEMPLATE = f"""
 <!DOCTYPE html>
 <html>
@@ -448,80 +448,126 @@ LO_SHU_TEMPLATE = f"""
             margin-bottom: 30px;
         }}
 
+        .intro-section {{
+            text-align: center;
+            margin-bottom: 30px;
+            padding: 20px;
+            background: linear-gradient(135deg, var(--accent-color), #66BB6A);
+            border-radius: 15px;
+            color: white;
+        }}
+
+        .intro-section h2 {{
+            margin: 0 0 10px 0;
+            font-size: 1.8em;
+        }}
+
+        .intro-section p {{
+            margin: 0;
+            opacity: 0.9;
+            font-size: 1.1em;
+        }}
+
         .date-form {{
-            margin: 20px 0;
+            margin: 30px 0;
         }}
 
         .date-inputs {{
             display: flex;
-            gap: 15px;
+            gap: 20px;
             justify-content: center;
             flex-wrap: wrap;
-            margin-bottom: 20px;
+            margin-bottom: 25px;
         }}
 
         .date-input {{
             display: flex;
             flex-direction: column;
             align-items: center;
+            background-color: var(--container-bg);
+            padding: 15px;
+            border-radius: 10px;
+            box-shadow: 0 2px 10px var(--shadow);
+            transition: transform 0.2s ease;
+        }}
+
+        .date-input:hover {{
+            transform: translateY(-2px);
         }}
 
         .date-input label {{
-            margin-bottom: 5px;
+            margin-bottom: 8px;
             font-weight: bold;
-            color: var(--text-secondary);
+            color: var(--accent-color);
+            font-size: 14px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
         }}
 
         .date-input input {{
-            padding: 8px 12px;
+            padding: 12px;
             border: 2px solid var(--border-color);
-            border-radius: 5px;
-            font-size: 16px;
+            border-radius: 8px;
+            font-size: 18px;
             background-color: var(--container-bg);
             color: var(--text-color);
             text-align: center;
-            width: 80px;
+            width: 90px;
+            font-weight: bold;
+            transition: all 0.3s ease;
         }}
 
         .date-input input:focus {{
             outline: none;
             border-color: var(--accent-color);
+            box-shadow: 0 0 0 3px rgba(76, 175, 80, 0.2);
+            transform: scale(1.05);
         }}
 
         .submit-btn {{
             text-align: center;
-            margin: 20px 0;
+            margin: 30px 0;
         }}
 
         .submit-btn input {{
-            background-color: var(--accent-color);
+            background: linear-gradient(135deg, var(--accent-color), #66BB6A);
             color: white;
-            padding: 12px 30px;
+            padding: 15px 40px;
             border: none;
-            border-radius: 25px;
+            border-radius: 30px;
             cursor: pointer;
             font-size: 16px;
             font-weight: bold;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 15px rgba(76, 175, 80, 0.3);
         }}
 
         .submit-btn input:hover {{
-            background-color: var(--accent-hover);
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(76, 175, 80, 0.4);
+        }}
+
+        .grid-section {{
+            text-align: center;
+            margin: 40px 0;
         }}
 
         .grid-container {{
             display: flex;
             justify-content: center;
             margin: 30px 0;
+            position: relative;
         }}
 
         .lo-shu-grid {{
             display: grid;
-            grid-template-columns: repeat(3, 80px);
-            grid-template-rows: repeat(3, 80px);
-            gap: 2px;
-            background-color: var(--accent-color);
-            border-radius: 10px;
-            padding: 10px;
+            grid-template-columns: repeat(3, 100px);
+            grid-template-rows: repeat(3, 100px);
+            gap: 3px;
+            background: linear-gradient(135deg, var(--accent-color), #66BB6A);
+            border-radius: 15px;
+            padding: 15px;
+            box-shadow: 0 8px 30px rgba(76, 175, 80, 0.3);
         }}
 
         .grid-cell {{
@@ -529,70 +575,243 @@ LO_SHU_TEMPLATE = f"""
             display: flex;
             align-items: center;
             justify-content: center;
-            font-size: 24px;
+            font-size: 28px;
             font-weight: bold;
             color: var(--text-color);
-            border-radius: 5px;
+            border-radius: 8px;
+            position: relative;
+            transition: all 0.3s ease;
+            cursor: pointer;
+        }}
+
+        .grid-cell:hover {{
+            transform: scale(1.05);
+            box-shadow: 0 4px 15px var(--shadow);
+        }}
+
+        .grid-cell.empty {{
+            background-color: rgba(244, 67, 54, 0.1);
+            border: 2px dashed #f44336;
         }}
 
         .grid-numbers {{
             color: var(--accent-color);
         }}
 
-        .analysis {{
-            margin-top: 30px;
-            padding: 20px;
-            background-color: var(--results-bg);
+        .grid-legend {{
+            margin: 20px 0;
+            padding: 15px;
+            background-color: var(--container-bg);
             border-radius: 10px;
-            border-left: 4px solid var(--accent-color);
+            border: 1px solid var(--border-color);
         }}
 
-        .analysis h3 {{
-            color: var(--text-color);
+        .legend-row {{
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 8px 0;
+            border-bottom: 1px solid var(--border-color);
+        }}
+
+        .legend-row:last-child {{
+            border-bottom: none;
+        }}
+
+        .legend-position {{
+            font-weight: bold;
+            color: var(--accent-color);
+        }}
+
+        .legend-meaning {{
+            color: var(--text-secondary);
+            font-size: 14px;
+        }}
+
+        .analysis {{
+            margin-top: 40px;
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 20px;
+        }}
+
+        .analysis-card {{
+            padding: 25px;
+            background-color: var(--container-bg);
+            border-radius: 15px;
+            box-shadow: 0 4px 20px var(--shadow);
+            border-left: 4px solid var(--accent-color);
+            transition: transform 0.3s ease;
+        }}
+
+        .analysis-card:hover {{
+            transform: translateY(-5px);
+        }}
+
+        .analysis-card h3 {{
+            color: var(--accent-color);
             margin-top: 0;
+            margin-bottom: 15px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }}
+
+        .analysis-card .icon {{
+            font-size: 1.5em;
         }}
 
         .analysis-section {{
-            margin: 15px 0;
+            margin: 20px 0;
         }}
 
         .analysis-section h4 {{
             color: var(--accent-color);
-            margin-bottom: 8px;
+            margin-bottom: 12px;
+            font-size: 1.1em;
         }}
 
         .analysis-section p {{
             color: var(--text-secondary);
             line-height: 1.6;
+            margin-bottom: 15px;
         }}
 
         .number-list {{
             display: flex;
             flex-wrap: wrap;
-            gap: 8px;
-            margin: 10px 0;
+            gap: 10px;
+            margin: 15px 0;
         }}
 
         .number-tag {{
-            background-color: var(--accent-color);
+            background: linear-gradient(135deg, var(--accent-color), #66BB6A);
             color: white;
-            padding: 4px 12px;
-            border-radius: 15px;
+            padding: 8px 16px;
+            border-radius: 20px;
             font-size: 14px;
             font-weight: bold;
+            box-shadow: 0 2px 8px rgba(76, 175, 80, 0.3);
+            transition: transform 0.2s ease;
+        }}
+
+        .number-tag:hover {{
+            transform: scale(1.1);
         }}
 
         .missing-tag {{
-            background-color: #f44336;
+            background: linear-gradient(135deg, #f44336, #ef5350);
+            box-shadow: 0 2px 8px rgba(244, 67, 54, 0.3);
+        }}
+
+        .stat-grid {{
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            gap: 15px;
+            margin: 20px 0;
+        }}
+
+        .stat-item {{
+            text-align: center;
+            padding: 15px;
+            background-color: var(--results-bg);
+            border-radius: 10px;
+            border: 1px solid var(--border-color);
+        }}
+
+        .stat-number {{
+            font-size: 2em;
+            font-weight: bold;
+            color: var(--accent-color);
+            display: block;
+        }}
+
+        .stat-label {{
+            font-size: 12px;
+            color: var(--text-muted);
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }}
+
+        .meanings-section {{
+            margin-top: 30px;
+            padding: 25px;
+            background: linear-gradient(135deg, rgba(76, 175, 80, 0.1), rgba(102, 187, 106, 0.1));
+            border-radius: 15px;
+            border: 1px solid var(--border-color);
+        }}
+
+        .meanings-section h4 {{
+            color: var(--accent-color);
+            text-align: center;
+            margin-bottom: 20px;
+            font-size: 1.3em;
+        }}
+
+        .meaning-item {{
+            display: flex;
+            align-items: flex-start;
+            margin: 15px 0;
+            padding: 15px;
+            background-color: var(--container-bg);
+            border-radius: 10px;
+            box-shadow: 0 2px 10px var(--shadow);
+        }}
+
+        .meaning-number {{
+            background: linear-gradient(135deg, var(--accent-color), #66BB6A);
+            color: white;
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            margin-right: 15px;
+            flex-shrink: 0;
+        }}
+
+        .meaning-content {{
+            flex: 1;
+        }}
+
+        .meaning-title {{
+            font-weight: bold;
+            color: var(--text-color);
+            margin-bottom: 5px;
+        }}
+
+        .meaning-desc {{
+            color: var(--text-secondary);
+            font-size: 14px;
+            line-height: 1.5;
         }}
 
         .error-message {{
-            background-color: #ffebee;
+            background: linear-gradient(135deg, #ffebee, #ffcdd2);
             color: #c62828;
-            padding: 15px;
-            border-radius: 5px;
+            padding: 20px;
+            border-radius: 10px;
             border-left: 4px solid #f44336;
             margin: 20px 0;
+            box-shadow: 0 2px 10px rgba(244, 67, 54, 0.2);
+        }}
+
+        @media (max-width: 768px) {{
+            .lo-shu-grid {{
+                grid-template-columns: repeat(3, 80px);
+                grid-template-rows: repeat(3, 80px);
+            }}
+            
+            .analysis {{
+                grid-template-columns: 1fr;
+            }}
+            
+            .date-inputs {{
+                flex-direction: column;
+                align-items: center;
+            }}
         }}
     </style>
 </head>
@@ -609,75 +828,193 @@ LO_SHU_TEMPLATE = f"""
         </div>
     </div>
     
+    <div class="intro-section">
+        <h2>🔮 Discover Your Destiny Numbers</h2>
+        <p>The Lo Shu Grid reveals your personality traits, strengths, and areas for growth based on your birth date numerology</p>
+    </div>
+    
     <div class="container">
         <form method="post" class="date-form">
             <div class="date-inputs">
                 <div class="date-input">
-                    <label>Day:</label>
-                    <input type="number" name="day" min="1" max="31" required value="{{{{ day if day else '' }}}}">
+                    <label>Day</label>
+                    <input type="number" name="day" min="1" max="31" required value="{{{{ day if day else '' }}}}" placeholder="DD">
                 </div>
                 <div class="date-input">
-                    <label>Month:</label>
-                    <input type="number" name="month" min="1" max="12" required value="{{{{ month if month else '' }}}}">
+                    <label>Month</label>
+                    <input type="number" name="month" min="1" max="12" required value="{{{{ month if month else '' }}}}" placeholder="MM">
                 </div>
                 <div class="date-input">
-                    <label>Year:</label>
-                    <input type="number" name="year" min="1900" max="2100" required value="{{{{ year if year else '' }}}}">
+                    <label>Year</label>
+                    <input type="number" name="year" min="1900" max="2100" required value="{{{{ year if year else '' }}}}" placeholder="YYYY">
                 </div>
             </div>
             <div class="submit-btn">
-                <input type="submit" value="Generate Lo Shu Grid">
+                <input type="submit" value="✨ Generate My Grid ✨">
             </div>
         </form>
 
         {{% if error_message %}}
             <div class="error-message">
-                {{{{ error_message }}}}
+                <strong>⚠️ Oops!</strong> {{{{ error_message }}}}
             </div>
         {{% endif %}}
 
         {{% if grid_data %}}
-            <div class="grid-container">
-                <div class="lo-shu-grid">
-                    {{% for cell in grid_data.grid %}}
-                        <div class="grid-cell">
-                            <span class="grid-numbers">{{{{ cell if cell else '' }}}}</span>
-                        </div>
-                    {{% endfor %}}
-                </div>
-            </div>
-
-            <div class="analysis">
-                <h3>Your Lo Shu Grid Analysis</h3>
+            <div class="grid-section">
+                <h3 style="color: var(--accent-color); text-align: center; margin-bottom: 20px;">
+                    🌟 Your Personal Lo Shu Grid 🌟
+                </h3>
                 
-                <div class="analysis-section">
-                    <h4>Birth Date:</h4>
-                    <p>{{{{ grid_data.date_string }}}}</p>
-                </div>
-
-                <div class="analysis-section">
-                    <h4>Present Numbers:</h4>
-                    <div class="number-list">
-                        {{% for num in grid_data.present_numbers %}}
-                            <span class="number-tag">{{{{ num }}}}</span>
+                <div class="grid-container">
+                    <div class="lo-shu-grid">
+                        {{% for i in range(9) %}}
+                            <div class="grid-cell {{{{ 'empty' if not grid_data.grid[i] else '' }}}}" 
+                                 title="Position {{{{ [4,9,2,3,5,7,8,1,6][i] }}}}: {{{{ ['Planning & Organization', 'Fame & Recognition', 'Knowledge & Wisdom', 'Patience & Hard Work', 'Mental Strength', 'Love & Care', 'Communication', 'Money & Material', 'Health & Harmony'][i] }}}}">
+                                <span class="grid-numbers">{{{{ grid_data.grid[i] if grid_data.grid[i] else '○' }}}}</span>
+                            </div>
                         {{% endfor %}}
                     </div>
-                    <p>These numbers represent your natural strengths and talents.</p>
                 </div>
 
-                <div class="analysis-section">
-                    <h4>Missing Numbers:</h4>
-                    <div class="number-list">
-                        {{% for num in grid_data.missing_numbers %}}
-                            <span class="number-tag missing-tag">{{{{ num }}}}</span>
-                        {{% endfor %}}
+                <div class="grid-legend">
+                    <h4 style="text-align: center; margin-bottom: 15px; color: var(--accent-color);">Grid Position Meanings</h4>
+                    <div class="legend-row">
+                        <span class="legend-position">4 - Planning</span>
+                        <span class="legend-position">9 - Fame</span>
+                        <span class="legend-position">2 - Knowledge</span>
                     </div>
-                    <p>These numbers represent areas for growth and development in your life.</p>
+                    <div class="legend-row">
+                        <span class="legend-position">3 - Patience</span>
+                        <span class="legend-position">5 - Mental Strength</span>
+                        <span class="legend-position">7 - Love</span>
+                    </div>
+                    <div class="legend-row">
+                        <span class="legend-position">8 - Money</span>
+                        <span class="legend-position">1 - Communication</span>
+                        <span class="legend-position">6 - Health</span>
+                    </div>
                 </div>
 
-                <div class="analysis-section">
-                    <h4>Total Numbers:</h4>
-                    <p><strong>{{{{ grid_data.total_count }}}}</strong> numbers from your birth date</p>
+                <div class="analysis">
+                    <div class="analysis-card">
+                        <h3><span class="icon">📊</span> Your Statistics</h3>
+                        <div class="stat-grid">
+                            <div class="stat-item">
+                                <span class="stat-number">{{{{ grid_data.date_string }}}}</span>
+                                <span class="stat-label">Birth Date</span>
+                            </div>
+                            <div class="stat-item">
+                                <span class="stat-number">{{{{ grid_data.present_numbers|length }}}}</span>
+                                <span class="stat-label">Active Numbers</span>
+                            </div>
+                            <div class="stat-item">
+                                <span class="stat-number">{{{{ grid_data.missing_numbers|length }}}}</span>
+                                <span class="stat-label">Growth Areas</span>
+                            </div>
+                            <div class="stat-item">
+                                <span class="stat-number">{{{{ grid_data.total_count }}}}</span>
+                                <span class="stat-label">Total Digits</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="analysis-card">
+                        <h3><span class="icon">💪</span> Your Strengths</h3>
+                        <div class="analysis-section">
+                            <p>These numbers appear in your birth date and represent your natural talents:</p>
+                            <div class="number-list">
+                                {{% for num in grid_data.present_numbers %}}
+                                    <span class="number-tag" title="Number {{{{ num }}}} strength">{{{{ num }}}}</span>
+                                {{% endfor %}}
+                            </div>
+                            {{% if not grid_data.present_numbers %}}
+                                <p style="color: var(--text-muted); font-style: italic;">No specific strengths identified from birth date digits.</p>
+                            {{% endif %}}
+                        </div>
+                    </div>
+
+                    <div class="analysis-card">
+                        <h3><span class="icon">🎯</span> Growth Opportunities</h3>
+                        <div class="analysis-section">
+                            <p>These missing numbers represent areas for personal development:</p>
+                            <div class="number-list">
+                                {{% for num in grid_data.missing_numbers %}}
+                                    <span class="number-tag missing-tag" title="Number {{{{ num }}}} - area for growth">{{{{ num }}}}</span>
+                                {{% endfor %}}
+                            </div>
+                            {{% if not grid_data.missing_numbers %}}
+                                <p style="color: var(--accent-color); font-weight: bold;">Amazing! All numbers are present in your birth date.</p>
+                            {{% endif %}}
+                        </div>
+                    </div>
+                </div>
+
+                <div class="meanings-section">
+                    <h4>🔍 Number Meanings & Life Areas</h4>
+                    <div class="meaning-item">
+                        <div class="meaning-number">1</div>
+                        <div class="meaning-content">
+                            <div class="meaning-title">Communication & Leadership</div>
+                            <div class="meaning-desc">Expression, speaking ability, leadership qualities, and social connections.</div>
+                        </div>
+                    </div>
+                    <div class="meaning-item">
+                        <div class="meaning-number">2</div>
+                        <div class="meaning-content">
+                            <div class="meaning-title">Knowledge & Intuition</div>
+                            <div class="meaning-desc">Learning capacity, wisdom, intuitive abilities, and emotional intelligence.</div>
+                        </div>
+                    </div>
+                    <div class="meaning-item">
+                        <div class="meaning-number">3</div>
+                        <div class="meaning-content">
+                            <div class="meaning-title">Patience & Hard Work</div>
+                            <div class="meaning-desc">Perseverance, dedication, ability to work through challenges systematically.</div>
+                        </div>
+                    </div>
+                    <div class="meaning-item">
+                        <div class="meaning-number">4</div>
+                        <div class="meaning-content">
+                            <div class="meaning-title">Planning & Organization</div>
+                            <div class="meaning-desc">Systematic thinking, organizational skills, and structured approach to life.</div>
+                        </div>
+                    </div>
+                    <div class="meaning-item">
+                        <div class="meaning-number">5</div>
+                        <div class="meaning-content">
+                            <div class="meaning-title">Mental Strength & Focus</div>
+                            <div class="meaning-desc">Mental resilience, concentration, ability to handle stress and pressure.</div>
+                        </div>
+                    </div>
+                    <div class="meaning-item">
+                        <div class="meaning-number">6</div>
+                        <div class="meaning-content">
+                            <div class="meaning-title">Health & Family Harmony</div>
+                            <div class="meaning-desc">Physical wellbeing, family relationships, nurturing, and caring nature.</div>
+                        </div>
+                    </div>
+                    <div class="meaning-item">
+                        <div class="meaning-number">7</div>
+                        <div class="meaning-content">
+                            <div class="meaning-title">Love & Relationships</div>
+                            <div class="meaning-desc">Emotional connections, romantic relationships, empathy, and compassion.</div>
+                        </div>
+                    </div>
+                    <div class="meaning-item">
+                        <div class="meaning-number">8</div>
+                        <div class="meaning-content">
+                            <div class="meaning-title">Money & Material Success</div>
+                            <div class="meaning-desc">Financial acumen, business sense, material achievements, and practical skills.</div>
+                        </div>
+                    </div>
+                    <div class="meaning-item">
+                        <div class="meaning-number">9</div>
+                        <div class="meaning-content">
+                            <div class="meaning-title">Fame & Recognition</div>
+                            <div class="meaning-desc">Public recognition, reputation, spiritual growth, and humanitarian nature.</div>
+                        </div>
+                    </div>
                 </div>
             </div>
         {{% endif %}}
